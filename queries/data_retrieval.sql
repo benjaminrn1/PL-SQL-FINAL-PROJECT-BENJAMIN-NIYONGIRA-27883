@@ -1,183 +1,162 @@
 -- ============================================
--- DATA RETRIEVAL QUERIES
--- Basic to advanced data retrieval operations
+-- WINDOW FUNCTIONS FOR AUDIT MONITORING
 -- ============================================
 
--- 1. BASIC DATA RETRIEVAL
--- -----------------------
--- 1.1 Retrieve all employees with their department info
-SELECT 
-    e.employee_id,
-    e.employee_name,
-    e.department,
-    e.position,
-    e.email,
-    e.restriction_applied,
-    TO_CHAR(e.hire_date, 'YYYY-MM-DD') AS hire_date
-FROM employees e
-ORDER BY e.department, e.employee_name;
-
--- 1.2 Get all test employee actions with employee details
-SELECT 
-    tea.action_id,
-    tea.employee_id,
-    e.employee_name,
-    tea.action_type,
-    tea.description,
-    tea.amount,
-    tea.status,
-    TO_CHAR(tea.action_date, 'YYYY-MM-DD HH24:MI:SS') AS action_date
-FROM test_employee_actions tea
-JOIN employees e ON tea.employee_id = e.employee_id
-ORDER BY tea.action_date DESC;
-
--- 1.3 Retrieve upcoming holidays
-SELECT 
-    holiday_id,
-    holiday_name,
-    TO_CHAR(holiday_date, 'YYYY-MM-DD Day') AS holiday_date,
-    description,
-    is_returning,
-    TO_CHAR(created_date, 'YYYY-MM-DD') AS created_date
-FROM holidays
-WHERE holiday_date >= TRUNC(SYSDATE)
-ORDER BY holiday_date;
-
--- 1.4 Get employee count by department
-SELECT 
-    department,
-    COUNT(*) AS employee_count,
-    SUM(CASE WHEN restriction_applied = 'Y' THEN 1 ELSE 0 END) AS restricted_count,
-    SUM(CASE WHEN restriction_applied = 'N' THEN 1 ELSE 0 END) AS unrestricted_count
-FROM employees
-GROUP BY department
-ORDER BY employee_count DESC;
-
--- 2. ADVANCED QUERIES WITH JOINS
--- --------------------------------
--- 2.1 Employee actions with audit trail
-SELECT 
-    e.employee_id,
-    e.employee_name,
-    tea.action_id,
-    tea.action_type AS table_action,
-    tea.amount,
-    tea.status AS action_status,
-    eal.action_type AS audit_action,
-    eal.status AS audit_status,
-    TO_CHAR(eal.action_timestamp, 'YYYY-MM-DD HH24:MI:SS') AS audit_time
-FROM employees e
-LEFT JOIN test_employee_actions tea ON e.employee_id = tea.employee_id
-LEFT JOIN employee_audit_log eal ON e.employee_id = eal.employee_id
-    AND tea.action_id = eal.record_id
-ORDER BY eal.action_timestamp DESC NULLS LAST;
-
--- 2.2 Daily audit summary
-SELECT 
-    TRUNC(action_timestamp) AS audit_date,
-    action_type,
-    status,
-    COUNT(*) AS attempt_count,
-    SUM(CASE WHEN status = 'ALLOWED' THEN 1 ELSE 0 END) AS allowed_count,
-    SUM(CASE WHEN status = 'DENIED' THEN 1 ELSE 0 END) AS denied_count,
-    SUM(CASE WHEN status = 'ERROR' THEN 1 ELSE 0 END) AS error_count
-FROM employee_audit_log
-GROUP BY TRUNC(action_timestamp), action_type, status
-ORDER BY audit_date DESC, action_type;
-
--- 3. COMPLEX FILTERING
--- ---------------------
--- 3.1 Find denied actions with details
-SELECT 
-    eal.audit_id,
-    eal.employee_id,
-    e.employee_name,
-    eal.action_type,
-    eal.table_name,
-    eal.record_id,
-    eal.day_of_week,
-    eal.is_holiday,
-    eal.is_weekday,
-    eal.error_message,
-    TO_CHAR(eal.action_timestamp, 'YYYY-MM-DD HH24:MI:SS') AS denied_time
-FROM employee_audit_log eal
-LEFT JOIN employees e ON eal.employee_id = e.employee_id
-WHERE eal.status = 'DENIED'
-ORDER BY eal.action_timestamp DESC;
-
--- 3.2 Find actions attempted on holidays
-SELECT 
-    eal.*,
-    h.holiday_name,
-    e.employee_name
-FROM employee_audit_log eal
-LEFT JOIN holidays h ON TRUNC(eal.action_timestamp) = h.holiday_date
-LEFT JOIN employees e ON eal.employee_id = e.employee_id
-WHERE eal.is_holiday = 'Y'
-ORDER BY eal.action_timestamp DESC;
-
--- 4. AGGREGATION QUERIES
--- -----------------------
--- 4.1 Monthly audit statistics
-SELECT 
-    TO_CHAR(action_timestamp, 'YYYY-MM') AS month,
-    COUNT(*) AS total_attempts,
-    SUM(CASE WHEN status = 'ALLOWED' THEN 1 ELSE 0 END) AS allowed,
-    SUM(CASE WHEN status = 'DENIED' THEN 1 ELSE 0 END) AS denied,
-    SUM(CASE WHEN status = 'ERROR' THEN 1 ELSE 0 END) AS errors,
-    ROUND(AVG(CASE WHEN status = 'ALLOWED' THEN 1 ELSE 0 END) * 100, 2) AS success_rate
-FROM employee_audit_log
-GROUP BY TO_CHAR(action_timestamp, 'YYYY-MM')
-ORDER BY month DESC;
-
--- 4.2 Employee activity summary
-SELECT 
-    e.employee_id,
-    e.employee_name,
-    e.department,
-    COUNT(eal.audit_id) AS total_actions,
-    SUM(CASE WHEN eal.status = 'ALLOWED' THEN 1 ELSE 0 END) AS allowed_actions,
-    SUM(CASE WHEN eal.status = 'DENIED' THEN 1 ELSE 0 END) AS denied_actions,
-    ROUND(SUM(CASE WHEN eal.status = 'ALLOWED' THEN 1 ELSE 0 END) * 100.0 / 
-          NULLIF(COUNT(eal.audit_id), 0), 2) AS success_percentage
-FROM employees e
-LEFT JOIN employee_audit_log eal ON e.employee_id = eal.employee_id
-GROUP BY e.employee_id, e.employee_name, e.department
-ORDER BY total_actions DESC;
-
--- 5. SUBQUERY EXAMPLES
--- ---------------------
--- 5.1 Employees with most denied attempts
+-- 1. Sequential Pattern Detection (for suspicious activity)
 SELECT 
     employee_id,
-    employee_name,
-    department,
-    (SELECT COUNT(*) 
-     FROM employee_audit_log eal 
-     WHERE eal.employee_id = e.employee_id 
-     AND eal.status = 'DENIED') AS denied_count,
-    (SELECT COUNT(*) 
-     FROM employee_audit_log eal 
-     WHERE eal.employee_id = e.employee_id) AS total_attempts
-FROM employees e
-WHERE (SELECT COUNT(*) 
-       FROM employee_audit_log eal 
-       WHERE eal.employee_id = e.employee_id 
-       AND eal.status = 'DENIED') > 0
-ORDER BY denied_count DESC;
+    action_timestamp,
+    action_type,
+    table_name,
+    status,
+    LAG(action_type, 1) OVER (
+        PARTITION BY employee_id 
+        ORDER BY action_timestamp
+    ) AS prev_action_1,
+    LAG(action_type, 2) OVER (
+        PARTITION BY employee_id 
+        ORDER BY action_timestamp
+    ) AS prev_action_2,
+    LEAD(action_type, 1) OVER (
+        PARTITION BY employee_id 
+        ORDER BY action_timestamp
+    ) AS next_action_1,
+    CASE 
+        WHEN action_type = 'DELETE' 
+             AND LAG(action_type, 1) OVER (PARTITION BY employee_id ORDER BY action_timestamp) = 'UPDATE'
+             AND LAG(action_type, 2) OVER (PARTITION BY employee_id ORDER BY action_timestamp) = 'INSERT'
+        THEN 'SUSPICIOUS_PATTERN'
+        WHEN COUNT(*) OVER (
+            PARTITION BY employee_id 
+            ORDER BY action_timestamp 
+            RANGE BETWEEN INTERVAL '5' MINUTE PRECEDING AND CURRENT ROW
+        ) > 10
+        THEN 'HIGH_FREQUENCY'
+        ELSE 'NORMAL'
+    END AS activity_pattern
+FROM employee_audit_log
+ORDER BY employee_id, action_timestamp DESC;
 
--- 5.2 Current month's holiday activity
+-- 2. Audit Volume Alerts (detect spikes)
 SELECT 
-    h.holiday_date,
-    h.holiday_name,
-    (SELECT COUNT(*) 
-     FROM employee_audit_log eal 
-     WHERE TRUNC(eal.action_timestamp) = h.holiday_date
-     AND eal.is_holiday = 'Y') AS attempts_on_holiday,
-    (SELECT COUNT(*) 
-     FROM employee_audit_log eal 
-     WHERE TRUNC(eal.action_timestamp) = h.holiday_date
-     AND eal.status = 'DENIED') AS denied_on_holiday
-FROM holidays h
-WHERE EXTRACT(MONTH FROM h.holiday_date) = EXTRACT(MONTH FROM SYSDATE)
-ORDER BY h.holiday_date;
+    audit_hour,
+    audit_count,
+    LAG(audit_count, 1) OVER (ORDER BY audit_hour) AS previous_hour_count,
+    ROUND(
+        (audit_count - LAG(audit_count, 1) OVER (ORDER BY audit_hour)) * 100.0 /
+        NULLIF(LAG(audit_count, 1) OVER (ORDER BY audit_hour), 0),
+        2
+    ) AS hour_over_hour_change_percent,
+    AVG(audit_count) OVER (
+        ORDER BY audit_hour 
+        ROWS BETWEEN 23 PRECEDING AND CURRENT ROW
+    ) AS twentyfour_hour_moving_avg,
+    CASE 
+        WHEN audit_count > 2 * AVG(audit_count) OVER (
+            ORDER BY audit_hour 
+            ROWS BETWEEN 23 PRECEDING AND CURRENT ROW
+        )
+        THEN 'VOLUME_SPIKE_ALERT'
+        ELSE 'NORMAL'
+    END AS volume_alert
+FROM (
+    SELECT 
+        TRUNC(action_timestamp, 'HH24') AS audit_hour,
+        COUNT(*) AS audit_count
+    FROM employee_audit_log
+    WHERE action_timestamp >= SYSTIMESTAMP - INTERVAL '7' DAY
+    GROUP BY TRUNC(action_timestamp, 'HH24')
+)
+ORDER BY audit_hour DESC;
+
+-- 3. Compliance Trend by Employee (for performance reviews)
+SELECT 
+    employee_id,
+    audit_week,
+    compliance_rate,
+    ROUND(
+        AVG(compliance_rate) OVER (
+            PARTITION BY employee_id 
+            ORDER BY audit_week 
+            ROWS BETWEEN 3 PRECEDING AND CURRENT ROW
+        ),
+        2
+    ) AS four_week_moving_avg,
+    ROUND(
+        compliance_rate - AVG(compliance_rate) OVER (
+            PARTITION BY employee_id 
+            ORDER BY audit_week 
+            ROWS BETWEEN 3 PRECEDING AND CURRENT ROW
+        ),
+        2
+    ) AS deviation_from_trend,
+    CASE 
+        WHEN compliance_rate < 0.8 * AVG(compliance_rate) OVER (
+            PARTITION BY employee_id 
+            ORDER BY audit_week 
+            ROWS BETWEEN 3 PRECEDING AND CURRENT ROW
+        )
+        THEN 'PERFORMANCE_DECLINE'
+        WHEN compliance_rate > 1.2 * AVG(compliance_rate) OVER (
+            PARTITION BY employee_id 
+            ORDER BY audit_week 
+            ROWS BETWEEN 3 PRECEDING AND CURRENT ROW
+        )
+        THEN 'PERFORMANCE_IMPROVEMENT'
+        ELSE 'STABLE'
+    END AS performance_trend
+FROM (
+    SELECT 
+        employee_id,
+        TRUNC(action_timestamp, 'IW') AS audit_week,
+        ROUND(
+            SUM(CASE WHEN status = 'ALLOWED' THEN 1 ELSE 0 END) * 100.0 /
+            NULLIF(COUNT(*), 0),
+            2
+        ) AS compliance_rate
+    FROM employee_audit_log
+    WHERE employee_id IS NOT NULL
+    GROUP BY employee_id, TRUNC(action_timestamp, 'IW')
+)
+ORDER BY employee_id, audit_week DESC;
+
+-- 4. Session Analysis with Window Functions
+SELECT 
+    session_user,
+    audit_date,
+    session_start,
+    session_end,
+    session_duration_minutes,
+    actions_per_session,
+    ROW_NUMBER() OVER (
+        PARTITION BY session_user 
+        ORDER BY session_duration_minutes DESC
+    ) AS session_length_rank,
+    RANK() OVER (
+        PARTITION BY audit_date 
+        ORDER BY actions_per_session DESC
+    ) AS daily_activity_rank,
+    AVG(session_duration_minutes) OVER (
+        PARTITION BY session_user
+    ) AS avg_session_length,
+    AVG(actions_per_session) OVER (
+        PARTITION BY session_user
+    ) AS avg_actions_per_session
+FROM (
+    SELECT 
+        session_user,
+        TRUNC(MIN(action_timestamp)) AS audit_date,
+        MIN(action_timestamp) AS session_start,
+        MAX(action_timestamp) AS session_end,
+        ROUND(
+            EXTRACT(MINUTE FROM (MAX(action_timestamp) - MIN(action_timestamp))) +
+            EXTRACT(HOUR FROM (MAX(action_timestamp) - MIN(action_timestamp))) * 60,
+            2
+        ) AS session_duration_minutes,
+        COUNT(*) AS actions_per_session
+    FROM employee_audit_log
+    GROUP BY session_user, 
+             TRUNC(action_timestamp),
+             FLOOR(EXTRACT(HOUR FROM action_timestamp) / 4) -- 4-hour session windows
+)
+ORDER BY session_user, session_start DESC;
