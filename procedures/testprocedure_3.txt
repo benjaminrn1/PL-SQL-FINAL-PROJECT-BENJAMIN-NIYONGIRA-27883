@@ -1,0 +1,48 @@
+
+Procedure PROC_CALCULATE_DAILY_REVENUE_SIMPLE compiled
+
+Testing simplified daily revenue procedure...
+============================================
+DAILY REVENUE REPORT
+Date: 2025-12-05
+============================================
+SUMMARY METRICS:
+----------------
+Total Revenue:      $3,037.97
+Total Orders:       1
+Avg Order Value:    $3,037.97
+Max Order Value:    $3,037.97
+Min Order Value:    $3,037.97
+Cancelled Orders:   0
+Returned Orders:    0
+Top Product:        SmartPhone Max Pro
+Top Customer:       John Smith
+
+HOURLY BREAKDOWN:
+-----------------
+Hour  Orders  Revenue      Avg Order
+----  ------  -----------  ----------
+  10       1    $3,037.97    $#######
+
+ADDITIONAL METRICS:
+-------------------
+Order Completion Rate:     0%
+Business Hours Revenue:    $3,037.97
+Avg Revenue per Hour:      $126.58
+
+============================================
+REPORT COMPLETED SUCCESSFULLY
+============================================
+
+RESULTS:
+--------
+Revenue: $3037.97
+Orders: 1
+Avg Order: $3037.97
+Top Product: SmartPhone Max Pro
+Top Customer: John Smith
+Message: Daily revenue report generated for 2025-12-05
+
+
+PL/SQL procedure successfully completed.
+

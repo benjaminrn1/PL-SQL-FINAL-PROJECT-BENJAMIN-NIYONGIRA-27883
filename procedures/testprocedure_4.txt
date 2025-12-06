@@ -1,0 +1,50 @@
+
+Procedure PROC_GENERATE_INVOICE compiled
+
+Testing invoice generation...
+Found order ID: 1
+Generating invoice for Order ID: 1
+===============================================
+               INVOICE GENERATED               
+===============================================
+Invoice #: INV-202512-000001
+Order #: 1
+Date: Dec 04, 2025
+Status: PROCESSING
+Payment Status: COMPLETED
+
+Customer: Customer 2
+Email: customer2@email.com
+Address: , Chicago, USA
+
+Shipping Address: 123 Main St, City 1
+Billing Address: 123 Main St, City 1
+
+------------------------------------------------
+Line  Product                     Qty  Price      Total
+----  -------------------------  ----  ---------  ----------
+   1  UltraBook Pro X1               1  $1,299.99   $1,254.49
+   2  Noise-Canceling Pro            1    $299.99     $284.99
+   3  Men's Casual Shirt             2     $39.99      $71.98
+   4  Men's Jeans                    1     $59.99      $50.99
+------------------------------------------------
+Subtotal:                                         $1,739.95
+Discount:                                            $77.50
+Tax (.5%):                                          $8.63
+------------------------------------------------
+Grand Total:                                      $1,671.08
+
+Amount Paid:                                        $499.19
+Balance Due:                                      $1,171.89
+===============================================
+Invoice saved to database
+Invoice INV-202512-000001 generated successfully for order 1
+
+Test Result:
+Success: YES
+Message: Invoice INV-202512-000001 generated successfully for order 1
+Invoice text length: 1463 characters
+
+
+PL/SQL procedure successfully completed.
+

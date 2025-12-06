@@ -1,0 +1,82 @@
+
+Procedure PROC_PROCESS_RETURN compiled
+
+=== TESTING PROC_PROCESS_RETURN ===
+
+Using Order ID: 3
+
+Initial inventory for product 2:
+SmartPhone Max Pro: 118 units
+
+=== TEST 1: SIMPLE REFUND ===
+============================================
+PROCESSING RETURN REQUEST
+============================================
+Order ID: 3
+Product ID: 2
+Return Quantity: 1
+Return Reason: Defective product
+Return Type: REFUND
+Days since order: 3 (max: 30)
+Product: SmartPhone Max Pro
+Original Quantity: 1
+Unit Price: $299.99
+Line Total: $299.99
+Refund Amount: $299.99
+Return ID created: 1000
+Inventory updated: +1 units for product 2
+Refund processed: $299.99
+Audit log recorded
+Customer return history updated
+============================================
+RETURN PROCESSING COMPLETED
+============================================
+Result: Return processed successfully. Return ID: 1000, Refund Amount: $299.99
+Success: YES
+Return ID: 1000
+Refund Amount: $299.99
+
+Updated inventory for product 2:
+SmartPhone Max Pro: 119 units
+
+=== TEST 2: STORE CREDIT ===
+============================================
+PROCESSING RETURN REQUEST
+============================================
+Order ID: 3
+Product ID: 2
+Return Quantity: 1
+Return Reason: Wrong size
+Return Type: CREDIT
+Days since order: 3 (max: 30)
+Product: SmartPhone Max Pro
+Original Quantity: 1
+Unit Price: $299.99
+Line Total: $299.99
+Refund Amount: $299.99
+Return ID created: 1001
+Inventory updated: +1 units for product 2
+Refund processed: $299.99
+Store credit added to customer 4
+All items returned. Order status updated to RETURNED
+Audit log recorded
+Customer return history updated
+============================================
+RETURN PROCESSING COMPLETED
+============================================
+Result: Return processed successfully. Return ID: 1001, Refund Amount: $299.99
+Success: YES
+
+=== TEST 3: INVALID QUANTITY (SHOULD FAIL) ===
+============================================
+PROCESSING RETURN REQUEST
+============================================
+Order ID: 3
+Product ID: 2
+Return Quantity: 10
+Return Reason: Defective
+Return Type: REFUND
+
+
+PL/SQL procedure successfully completed.
+

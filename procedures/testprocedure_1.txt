@@ -1,0 +1,26 @@
+=== STARTING TEST ===
+Current order_seq: 11
+Current order_item_seq: 11
+Creating order with 2 items...
+Creating Order ID: 12
+Total: $3099.97, Discount: $310, Tax: $248
+  Creating item ID: 12 for product: 1
+  Creating item ID: 13 for product: 2
+Order 12 created successfully!
+Total Items: 2
+Net Amount: $3037.97
+=== TEST RESULTS ===
+Order ID: 12
+Status: SUCCESS
+
+=== VERIFICATION ===
+Order 12 for customer 1001
+Total: $3099.97, Discount: $310, Tax: $248, Net: $3037.97
+
+Order Items:
+  12: UltraBook Pro X1 x1 @$1299.99 = $1299.99
+  13: SmartPhone Max Pro x2 @$899.99 = $1799.98
+
+
+PL/SQL procedure successfully completed.
+

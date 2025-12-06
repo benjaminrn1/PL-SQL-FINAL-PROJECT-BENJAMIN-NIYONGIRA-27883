@@ -1,0 +1,33 @@
+
+Procedure PROC_UPDATE_ORDER_STATUS compiled
+
+=== DIAGNOSTIC TEST ===
+Current order 12:
+  Status: PENDING
+  Date: 2025-12-05 10:54:10
+  Age (hours): .39
+
+=== Testing Status Validation ===
+All status values in orders table:
+  - DELIVERED
+  - PENDING
+  - PROCESSING
+  - SHIPPED
+
+=== Testing PROC_UPDATE_ORDER_STATUS ===
+Current status: PENDING
+DEBUG: Starting status update for order 12
+DEBUG: Requested new status: PROCESSING
+DEBUG: Current status: PENDING
+DEBUG: Customer ID: 1001
+DEBUG: Order status updated in database
+DEBUG: Exception: ORA-06592: CASE not found while executing CASE statement
+DEBUG: Error Code: -6592
+Result: Error: ORA-06592: CASE not found while executing CASE statement
+Success: NO
+
+=== AUDIT TRAIL ===
+
+
+PL/SQL procedure successfully completed.
+
