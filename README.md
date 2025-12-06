@@ -1,7 +1,7 @@
-I'll help you create a comprehensive **Customer Order & Sales Analytics System** project following all 8 phases of your capstone requirements. Let's build this step-by-step:
+
 
 ## **CUSTOMER ORDER & SALES ANALYTICS SYSTEM**
-*Student: [Your Name], ID: [Your Student ID]*
+*Student: Benjamin Niyongira, ID: 27883*
 
 ---
 
@@ -80,8 +80,8 @@ Create comprehensive table with columns, types, constraints, descriptions
 ## **PHASE IV: DATABASE CREATION**
 
 ### **Database Name:**
-`[GroupDay]_[StudentID]_[YourName]_SalesAnalytics_DB`
-Example: `mon_12345_John_SalesAnalytics_DB`
+`thu_27883_benjamin_SalesAnalytics_DB`
+
 
 ### **Configuration Scripts:**
 ```sql
@@ -133,7 +133,7 @@ CREATE TABLE orders (
     CONSTRAINT chk_status CHECK (status IN ('PENDING','PROCESSING','SHIPPED','DELIVERED','CANCELLED'))
 );
 
--- Create all other tables similarly...
+-- other tables are in tables folder...
 ```
 
 ### **Data Insertion:**
@@ -393,39 +393,4 @@ GROUP BY TO_CHAR(order_date, 'YYYY-MM')
 ORDER BY sales_month;
 ```
 
-### **Presentation Slides (10 slides):**
 
-1. **Title Slide:** Project title, your name, date, AUCA logo
-2. **Problem Statement:** Fragmented sales data, manual processes, lack of insights
-3. **Solution Overview:** Centralized order management with BI capabilities
-4. **Database Design:** ER diagram showing 8 main entities
-5. **Business Process:** Swimlane diagram of order-to-cash process
-6. **Technical Implementation:** PL/SQL procedures, functions, packages
-7. **Advanced Features:** Triggers, auditing, security rules
-8. **BI & Analytics:** Dashboard mockups, KPIs defined
-9. **Results & Testing:** Screenshots of working system, test results
-10. **Conclusion & Q&A:** Lessons learned, future enhancements
-
----
-
-## **SUBMISSION CHECKLIST:**
-
-- [ ] All code is original and tested
-- [ ] GitHub repository is properly organized with meaningful commits
-- [ ] Screenshots include project name
-- [ ] PowerPoint is exactly 10 slides
-- [ ] All 8 phases completed
-- [ ] BI implementation included
-- [ ] Submitted before December 7, 2025 deadline
-
----
-
-## **PROJECT COMPLEXITY ENHANCEMENTS (for bonus points):**
-
-1. **Predictive Analytics:** Implement sales forecasting using historical data
-2. **Real-time Monitoring:** Create alert system for unusual sales patterns
-3. **Integration:** Simulate API calls to external payment gateways
-4. **Advanced Security:** Implement row-level security for different user roles
-5. **Performance Optimization:** Use materialized views for frequently accessed reports
-
-This comprehensive plan covers all requirements from your document. Each phase builds upon the previous one, creating a production-ready Customer Order & Sales Analytics System with full BI capabilities.
