@@ -71,11 +71,7 @@ Create swimlane diagram showing:
 ### **Data Dictionary:**
 Create comprehensive table with columns, types, constraints, descriptions
 
-### **BI Considerations:**
-- **Fact Tables:** ORDERS, ORDER_ITEMS, PAYMENTS
-- **Dimension Tables:** CUSTOMERS, PRODUCTS, TIME, EMPLOYEES
-- **Slow Changing Dimensions:** Customer segmentation changes, product category updates
-- **Audit Trail:** Track price changes, status updates
+![Alt text](ER%20DIAGRAM.PNG)
 
 ---
 
@@ -223,6 +219,8 @@ FROM orders;
 ```
 
 ---
+
+![Alt text](window%20functio.PNG)
 
 ## **PHASE VII: ADVANCED PROGRAMMING & AUDITING**
 
