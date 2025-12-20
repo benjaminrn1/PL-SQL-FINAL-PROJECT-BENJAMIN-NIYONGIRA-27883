@@ -47,6 +47,8 @@ Create swimlane diagram showing:
 - Decision points (payment approved? inventory available?)
 - Data flows between entities
 
+  ![Alt text](diagram.svg)
+
 ---
 
 ## **PHASE III: LOGICAL MODEL DESIGN**
@@ -100,6 +102,8 @@ QUOTA UNLIMITED ON sales_data;
 -- Grant privileges
 GRANT CONNECT, RESOURCE, DBA TO sales_admin;
 ```
+
+![Alt text](database%20info.PNG)
 
 ---
 
